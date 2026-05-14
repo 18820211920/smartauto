@@ -1,0 +1,35 @@
+# dependencies
+/node_modules
+
+# build output
+/docs/system-dev/dist
+
+# local env files
+/docs/system-dev/.env
+/docs/system-dev/.env.local
+/docs/system-dev/.env.*.local
+
+# editor directories and files
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# coverage
+coverage/
+
+# misc
+.cache/
+.vite/
+.turbo/
+dist-ssr/
+*.local
