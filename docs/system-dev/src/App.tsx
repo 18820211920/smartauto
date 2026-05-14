@@ -326,6 +326,17 @@ function PhaseCard({ phase, onClick, expanded }: { phase: Phase; onClick: () => 
   // 测试相关状态
   const [showTest, setShowTest] = useState(false)
   const [testResults, setTestResults] = useState<Record<string, 'pass' | 'fail' | 'testing'>>({})
+  const [showLog, setShowLog] = useState(false)
+  const [testLog, setTestLog] = useState<{ time: string; name: string; result: string; phase: string }[]>(() => {
+    // 从 localStorage 恢复日志
+    const saved = localStorage.getItem(`testlog-${phase.id}`)
+    return saved ? JSON.parse(saved) : []
+  })
+
+  // 保存日志到 localStorage
+  useEffect(() => {
+    localStorage.setItem(`testlog-${phase.id}`, JSON.stringify(testLog))
+  }, [testLog, phase.id])
 
   // 每个Phase对应的测试项
   const testItems: Record<string, { name: string; desc: string }[]> = {
@@ -400,10 +411,17 @@ function PhaseCard({ phase, onClick, expanded }: { phase: Phase; onClick: () => 
   const runTest = async (phaseId: string, testName: string) => {
     setTestResults(prev => ({ ...prev, [testName]: 'testing' }))
     await new Promise(r => setTimeout(r, 800 + Math.random() * 400)) // 模拟检测
-    // 模拟：进行中的Phase返回fail，已完成的Phase返回pass
     const phase = PHASES.find(p => p.id === phaseId)
     const isPass = phase?.status === 'completed' || (phase?.status === 'in_progress' && Math.random() > 0.3)
-    setTestResults(prev => ({ ...prev, [testName]: isPass ? 'pass' : 'fail' }))
+    const result = isPass ? 'pass' : 'fail'
+    setTestResults(prev => ({ ...prev, [testName]: result }))
+    // 写入开发日志
+    setTestLog(prev => [{
+      time: new Date().toLocaleString('zh-CN'),
+      name: testName,
+      result: result === 'pass' ? '✅ 通过' : '❌ 失败',
+      phase: PHASES.find(p => p.id === phaseId)?.name || phaseId,
+    }, ...prev].slice(0, 50))
   }
 
   // 一键执行全部测试
@@ -478,6 +496,18 @@ function PhaseCard({ phase, onClick, expanded }: { phase: Phase; onClick: () => 
             onMouseLeave={e => (e.currentTarget.style.background = `${phase.color}0a`)}
           >
             🧪 测试验证
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowLog(true) }}
+            style={{
+              padding: '8px 14px', borderRadius: 8, border: `1px solid ${phase.color}44`,
+              background: `${phase.color}0a`, color: phase.color, fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: 4,
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = `${phase.color}1a`)}
+            onMouseLeave={e => (e.currentTarget.style.background = `${phase.color}0a`)}
+          >
+            📋 日志 {testLog.length > 0 && <span style={{ background: phase.color, color: '#fff', borderRadius: 10, padding: '0 5px', fontSize: 10 }}>{testLog.length}</span>}
           </button>
         </div>
       </div>
@@ -566,6 +596,69 @@ function PhaseCard({ phase, onClick, expanded }: { phase: Phase; onClick: () => 
             {/* 关闭按钮 */}
             <div style={{ marginTop: 20, textAlign: 'center' }}>
               <button onClick={() => setShowTest(false)}
+                style={{ padding: '8px 24px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg2)', color: 'var(--text2)', fontSize: 13, cursor: 'pointer' }}>
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 开发日志弹窗 */}
+      {showLog && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 998,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        }} onClick={() => setShowLog(false)}>
+          <div style={{
+            background: 'var(--bg)', border: `1px solid ${phase.color}44`,
+            borderRadius: 16, padding: 24, width: '100%', maxWidth: 560,
+            maxHeight: '85vh', overflow: 'auto',
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 12, height: 12, borderRadius: '50%', background: phase.color }} />
+              <div style={{ fontSize: 16, fontWeight: 600 }}>{phase.name} · 开发日志</div>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: 12 }}>
+                <span style={{ fontSize: 12, color: 'var(--text3)' }}>{testLog.length} 条记录</span>
+                <button onClick={() => { setTestLog([]); localStorage.removeItem(`testlog-${phase.id}`) }}
+                  style={{ fontSize: 11, color: 'var(--red)', background: 'none', border: '1px solid var(--red)', cursor: 'pointer', padding: '2px 8px', borderRadius: 4 }}>
+                  清空
+                </button>
+              </div>
+            </div>
+
+            {testLog.length === 0 ? (
+              <div style={{ padding: '32px 0', textAlign: 'center', color: 'var(--text3)', fontSize: 13 }}>
+                暂无测试记录<br />点击「测试验证」执行测试后，日志将自动记录于此
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {testLog.map((log, i) => (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 14px', borderRadius: 8,
+                    background: log.result.includes('通过') ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)',
+                    border: `1px solid ${log.result.includes('通过') ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                  }}>
+                    <div style={{ fontSize: 16, flexShrink: 0 }}>{log.result.includes('通过') ? '✅' : '❌'}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: log.result.includes('通过') ? 'var(--green)' : 'var(--red)' }}>
+                        {log.name}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 2 }}>
+                        {log.phase} · {log.result.replace('✅ ', '').replace('❌ ', '')}
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--text3)', flexShrink: 0, textAlign: 'right' }}>
+                      {log.time}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ marginTop: 20, textAlign: 'center' }}>
+              <button onClick={() => setShowLog(false)}
                 style={{ padding: '8px 24px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg2)', color: 'var(--text2)', fontSize: 13, cursor: 'pointer' }}>
                 关闭
               </button>
