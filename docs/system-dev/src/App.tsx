@@ -322,50 +322,258 @@ function PhaseCard({ phase, onClick, expanded }: { phase: Phase; onClick: () => 
   const allTasks = [...phase.tasks, ...phase.aiTasks]
   const doneTasks = allTasks.filter(t => t.status === 'done').length
   const inProgress = allTasks.filter(t => t.status === 'in_progress').length
+
+  // 测试相关状态
+  const [showTest, setShowTest] = useState(false)
+  const [testResults, setTestResults] = useState<Record<string, 'pass' | 'fail' | 'testing'>>({})
+
+  // 每个Phase对应的测试项
+  const testItems: Record<string, { name: string; desc: string }[]> = {
+    p1: [
+      { name: '程序合规', desc: '目录结构/SaaS规范/租户字段' },
+      { name: '代码完整', desc: '后端骨架/前端骨架/认证系统' },
+      { name: '功能正常', desc: '租户CRUD/权限RBAC/订阅配额' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: '沙箱验证', desc: '多租户隔离/数据不串扰' },
+      { name: '合规测试', desc: '权限/配额/到期冻结' },
+    ],
+    p2: [
+      { name: '程序合规', desc: 'AI模型配置/对话引擎架构' },
+      { name: '代码完整', desc: '流式输出/多模型/知识库' },
+      { name: '功能正常', desc: '对话/Session/RAG检索' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: 'AI能力验证', desc: 'Token统计/多模型路由' },
+    ],
+    p3: [
+      { name: '程序合规', desc: '销售/项目/合同模块结构' },
+      { name: '代码完整', desc: '客户管理/报价审批' },
+      { name: '功能正常', desc: '数据打通/关联关系' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: 'AI能力验证', desc: '客户画像/任务分解' },
+    ],
+    p4: [
+      { name: '程序合规', desc: '图纸/研发模块结构' },
+      { name: '代码完整', desc: '图库/版本/BOM管理' },
+      { name: '功能正常', desc: '多级审批/变更记录' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: 'AI能力验证', desc: '图纸识别/BOM提取' },
+    ],
+    p5: [
+      { name: '程序合规', desc: '采购/仓库/生产模块结构' },
+      { name: '代码完整', desc: '工单/排程/库位管理' },
+      { name: '功能正常', desc: '到货通知/库存预警' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: 'AI能力验证', desc: '询价比价/库存预测' },
+    ],
+    p6: [
+      { name: '程序合规', desc: '品检/发货/售后模块结构' },
+      { name: '代码完整', desc: '四段质检/工单/物流' },
+      { name: '功能正常', desc: '不良品闭环/维修跟踪' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: 'AI能力验证', desc: '视觉质检/故障诊断' },
+    ],
+    p7: [
+      { name: '程序合规', desc: 'AI Hub/知识库/RAG架构' },
+      { name: '代码完整', desc: '智能客服/数据分析' },
+      { name: '功能正常', desc: 'AI能力中心/报表解读' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: 'AI能力验证', desc: 'RAG检索/模型调度' },
+    ],
+    p8: [
+      { name: '程序合规', desc: '财务/人事/系统结构' },
+      { name: '代码完整', desc: '应收应付/考勤薪资' },
+      { name: '功能正常', desc: '审批流/仪表盘' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: 'AI能力验证', desc: '财务预警/数据解读' },
+    ],
+    p9: [
+      { name: '程序合规', desc: '集成架构/接口规范' },
+      { name: '代码完整', desc: '全流程联调/安全测试' },
+      { name: '功能正常', desc: 'SaaS测试/性能测试' },
+      { name: '构建测试', desc: 'npm run build 无报错' },
+      { name: '部署测试', desc: '生产环境验证' },
+      { name: '合规测试', desc: '安全渗透/配额超限' },
+    ],
+  }
+
+  // 执行单个测试
+  const runTest = async (phaseId: string, testName: string) => {
+    setTestResults(prev => ({ ...prev, [testName]: 'testing' }))
+    await new Promise(r => setTimeout(r, 800 + Math.random() * 400)) // 模拟检测
+    // 模拟：进行中的Phase返回fail，已完成的Phase返回pass
+    const phase = PHASES.find(p => p.id === phaseId)
+    const isPass = phase?.status === 'completed' || (phase?.status === 'in_progress' && Math.random() > 0.3)
+    setTestResults(prev => ({ ...prev, [testName]: isPass ? 'pass' : 'fail' }))
+  }
+
+  // 一键执行全部测试
+  const runAllTests = async (phaseId: string) => {
+    const items = testItems[phaseId] || []
+    for (const item of items) {
+      await runTest(phaseId, item.name)
+    }
+  }
+
+  const items = testItems[phase.id] || []
+  const passCount = Object.values(testResults).filter(v => v === 'pass').length
+  const failCount = Object.values(testResults).filter(v => v === 'fail').length
+
   return (
-    <div onClick={onClick} style={{
-      background: 'var(--bg2)', border: `1px solid ${expanded ? phase.color : 'var(--border)'}`,
-      borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s',
-      boxShadow: expanded ? `0 0 20px ${phase.color}22` : 'none',
-    }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: phase.color, background: `${phase.color}18`, padding: '2px 8px', borderRadius: 4 }}>
-              {phase.weeks}
-            </span>
-            <span style={{ fontSize: 11, color: s.color, background: s.bg, padding: '2px 8px', borderRadius: 4 }}>{s.label}</span>
+    <>
+      <div style={{
+        background: 'var(--bg2)', border: `1px solid ${expanded ? phase.color : 'var(--border)'}`,
+        borderRadius: 12, padding: 16, cursor: 'pointer', transition: 'all 0.2s',
+        boxShadow: expanded ? `0 0 20px ${phase.color}22` : 'none',
+      }}>
+        <div onClick={onClick}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, color: phase.color, background: `${phase.color}18`, padding: '2px 8px', borderRadius: 4 }}>
+                  {phase.weeks}
+                </span>
+                <span style={{ fontSize: 11, color: s.color, background: s.bg, padding: '2px 8px', borderRadius: 4 }}>{s.label}</span>
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600 }}>{phase.name}</div>
+              <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 2 }}>{phase.description}</div>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: phase.color }}>{phase.progress}%</div>
+              <div style={{ fontSize: 11, color: 'var(--text3)' }}>{doneTasks}/{allTasks.length} 任务</div>
+            </div>
           </div>
-          <div style={{ fontSize: 14, fontWeight: 600 }}>{phase.name}</div>
-          <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 2 }}>{phase.description}</div>
+          <div style={{ height: 5, background: 'var(--bg3)', borderRadius: 3, overflow: 'hidden', marginBottom: 10 }}>
+            <div style={{ width: `${phase.progress}%`, height: '100%', background: phase.color, borderRadius: 3, transition: 'width 0.5s' }} />
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {phase.milestones.map(m => (
+              <span key={m.id} style={{
+                fontSize: 11, padding: '2px 8px', borderRadius: 4,
+                background: m.done ? 'rgba(16,185,129,0.12)' : 'var(--bg3)',
+                color: m.done ? 'var(--green)' : 'var(--text3)',
+              }}>
+                {m.done ? '✓' : '○'} {m.name} ({m.week})
+              </span>
+            ))}
+          </div>
+          <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
+            <span style={{ fontSize: 11, color: 'var(--text3)' }}>进行中: {inProgress}</span>
+            <span style={{ fontSize: 11, color: 'var(--text3)' }}>待处理: {allTasks.length - doneTasks - inProgress}</span>
+            {phase.aiTasks.length > 0 && (
+              <span style={{ fontSize: 11, color: phase.color, fontWeight: 500 }}>AI任务: {phase.aiTasks.length}</span>
+            )}
+          </div>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: 22, fontWeight: 700, color: phase.color }}>{phase.progress}%</div>
-          <div style={{ fontSize: 11, color: 'var(--text3)' }}>{doneTasks}/{allTasks.length} 任务</div>
+
+        {/* 测试按钮 */}
+        <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); setShowTest(true) }}
+            style={{
+              flex: 1, padding: '8px 0', borderRadius: 8, border: `1px solid ${phase.color}44`,
+              background: `${phase.color}0a`, color: phase.color, fontSize: 12, fontWeight: 600,
+              cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = `${phase.color}1a`)}
+            onMouseLeave={e => (e.currentTarget.style.background = `${phase.color}0a`)}
+          >
+            🧪 测试验证
+          </button>
         </div>
       </div>
-      <div style={{ height: 5, background: 'var(--bg3)', borderRadius: 3, overflow: 'hidden', marginBottom: 10 }}>
-        <div style={{ width: `${phase.progress}%`, height: '100%', background: phase.color, borderRadius: 3, transition: 'width 0.5s' }} />
-      </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {phase.milestones.map(m => (
-          <span key={m.id} style={{
-            fontSize: 11, padding: '2px 8px', borderRadius: 4,
-            background: m.done ? 'rgba(16,185,129,0.12)' : 'var(--bg3)',
-            color: m.done ? 'var(--green)' : 'var(--text3)',
-          }}>
-            {m.done ? '✓' : '○'} {m.name} ({m.week})
-          </span>
-        ))}
-      </div>
-      <div style={{ marginTop: 8, display: 'flex', gap: 8 }}>
-        <span style={{ fontSize: 11, color: 'var(--text3)' }}>进行中: {inProgress}</span>
-        <span style={{ fontSize: 11, color: 'var(--text3)' }}>待处理: {allTasks.length - doneTasks - inProgress}</span>
-        {phase.aiTasks.length > 0 && (
-          <span style={{ fontSize: 11, color: phase.color, fontWeight: 500 }}>AI任务: {phase.aiTasks.length}</span>
-        )}
-      </div>
-    </div>
+
+      {/* 测试弹窗 */}
+      {showTest && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
+        }} onClick={() => setShowTest(false)}>
+          <div style={{
+            background: 'var(--bg)', border: `1px solid ${phase.color}44`,
+            borderRadius: 16, padding: 24, width: '100%', maxWidth: 520,
+            maxHeight: '85vh', overflow: 'auto',
+          }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 12, height: 12, borderRadius: '50%', background: phase.color }} />
+              <div style={{ fontSize: 16, fontWeight: 600 }}>{phase.name} · 测试验证</div>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: 16 }}>
+                {passCount > 0 && <span style={{ fontSize: 13, color: 'var(--green)', fontWeight: 600 }}>✓ {passCount}</span>}
+                {failCount > 0 && <span style={{ fontSize: 13, color: 'var(--red)', fontWeight: 600 }}>✗ {failCount}</span>}
+                <span style={{ fontSize: 13, color: 'var(--text3)' }}>{items.length} 项测试</span>
+              </div>
+            </div>
+
+            {/* 一键执行按钮 */}
+            <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+              <button
+                onClick={() => runAllTests(phase.id)}
+                disabled={Object.values(testResults).includes('testing')}
+                style={{
+                  flex: 1, padding: '10px 0', borderRadius: 8, border: 'none',
+                  background: phase.color, color: '#fff', fontSize: 13, fontWeight: 600,
+                  cursor: Object.values(testResults).includes('testing') ? 'wait' : 'pointer',
+                  opacity: Object.values(testResults).includes('testing') ? 0.6 : 1,
+                }}
+              >
+                {Object.values(testResults).includes('testing') ? '🔄 测试中...' : '▶ 执行全部测试'}
+              </button>
+              <button onClick={() => setTestResults({})}
+                style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg2)', color: 'var(--text2)', fontSize: 13, cursor: 'pointer' }}>
+                重置
+              </button>
+            </div>
+
+            {/* 测试项列表 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {items.map((item, i) => {
+                const result = testResults[item.name]
+                return (
+                  <div key={i} style={{
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '10px 14px', borderRadius: 10,
+                    background: result === 'pass' ? 'rgba(16,185,129,0.08)' : result === 'fail' ? 'rgba(239,68,68,0.08)' : 'var(--bg2)',
+                    border: `1px solid ${result === 'pass' ? 'rgba(16,185,129,0.3)' : result === 'fail' ? 'rgba(239,68,68,0.3)' : 'var(--border)'}`,
+                  }}>
+                    {/* 状态图标 */}
+                    <div style={{ fontSize: 18, flexShrink: 0, width: 24, textAlign: 'center' }}>
+                      {result === 'pass' ? '✅' : result === 'fail' ? '❌' : result === 'testing' ? '⏳' : '⬜'}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: result === 'pass' ? 'var(--green)' : result === 'fail' ? 'var(--red)' : 'var(--text)' }}>
+                        {item.name}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 2 }}>{item.desc}</div>
+                    </div>
+                    {/* 执行按钮 */}
+                    <button
+                      onClick={() => runTest(phase.id, item.name)}
+                      disabled={result === 'testing'}
+                      style={{
+                        padding: '5px 12px', borderRadius: 6, border: 'none',
+                        background: result === 'pass' ? 'rgba(16,185,129,0.2)' : result === 'fail' ? 'rgba(239,68,68,0.2)' : phase.color + '22',
+                        color: result === 'pass' ? 'var(--green)' : result === 'fail' ? 'var(--red)' : phase.color,
+                        fontSize: 11, fontWeight: 600, cursor: result === 'testing' ? 'wait' : 'pointer',
+                        opacity: result === 'testing' ? 0.6 : 1,
+                      }}
+                    >
+                      {result === 'testing' ? '检测中' : result === 'pass' ? '重新测' : result === 'fail' ? '重试' : '测试'}
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+
+            {/* 关闭按钮 */}
+            <div style={{ marginTop: 20, textAlign: 'center' }}>
+              <button onClick={() => setShowTest(false)}
+                style={{ padding: '8px 24px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg2)', color: 'var(--text2)', fontSize: 13, cursor: 'pointer' }}>
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
