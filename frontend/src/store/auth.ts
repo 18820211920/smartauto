@@ -1,0 +1,60 @@
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
+import api from '../api/http';
+
+interface User {
+  id: number;
+  username: string;
+  realName: string;
+}
+
+interface ApiResponse {
+  code: number;
+  message: string;
+  data: any;
+}
+
+interface AuthState {
+  token: string | null;
+  user: User | null;
+  tenant: any;
+  login: (username: string, password: string) => Promise<{ success: boolean; message?: string }>;
+  logout: () => void;
+  fetchTenant: () => Promise<void>;
+}
+
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set, get) => ({
+      token: null,
+      user: null,
+      tenant: null,
+
+      login: async (username: string, password: string) => {
+        try {
+          const res = await api.post('/user/login', { username, password }) as ApiResponse;
+          if (res.code === 0) {
+            set({ token: res.data.token, user: res.data.user });
+            await get().fetchTenant();
+            return { success: true };
+          }
+          return { success: false, message: res.message };
+        } catch (err: any) {
+          return { success: false, message: err.message || '登录失败' };
+        }
+      },
+
+      logout: () => {
+        set({ token: null, user: null, tenant: null });
+      },
+
+      fetchTenant: async () => {
+        try {
+          const res = await api.get('/tenant/info') as ApiResponse;
+          if (res.code === 0) set({ tenant: res.data });
+        } catch (_) {}
+      },
+    }),
+    { name: 'smartauto-auth' }
+  )
+);
