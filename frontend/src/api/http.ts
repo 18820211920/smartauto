@@ -1,30 +1,35 @@
-import axios from 'axios';
+import axios from 'axios'
 
 const api = axios.create({
-  baseURL: '/smartauto-api',
+  baseURL: 'http://123.207.15.108:3847',
   timeout: 15000,
-  withCredentials: true,
-});
+  withCredentials: false,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
 
 api.interceptors.request.use(config => {
-  const token = localStorage.getItem('smartauto-auth');
+  const token = localStorage.getItem('smartauto-auth')
   if (token) {
     try {
-      const stored = JSON.parse(token);
+      const stored = JSON.parse(token)
       if (stored.state?.token) {
-        config.headers.Authorization = `Bearer ${stored.state.token}`;
+        config.headers.Authorization = `Bearer ${stored.state.token}`
       }
     } catch (_) {}
   }
-  return config;
-});
+  return config
+})
 
 api.interceptors.response.use(
   res => res.data,
   err => {
-    const msg = err.response?.data?.message || err.message;
-    return Promise.reject(new Error(msg));
+    const msg = err.response?.data?.message || err.message
+    return Promise.reject(new Error(msg))
   }
-);
+)
 
-export default api;
+export const http = api
+export default api
+
