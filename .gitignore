@@ -3,6 +3,12 @@
 
 # build output
 /docs/system-dev/dist
+frontend/dist/assets/
+*.local
+build/
+dist-ssr/
+.vite/
+.turbo/
 
 # local env files
 /docs/system-dev/.env
@@ -26,10 +32,9 @@ pnpm-debug.log*
 
 # coverage
 coverage/
-
-# misc
 .cache/
-.vite/
-.turbo/
-dist-ssr/
-*.local
+
+# misc backup files
+*.bak
+*.bak1
+*.bak2

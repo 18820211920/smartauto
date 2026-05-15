@@ -53,85 +53,67 @@ export async function listModels(): Promise<AIModel[]> {
   return res.data?.items || [];
 }
 
-// 发送消息（流式）
+// 发送消息（非流式，后端返回完整内容）
 export async function sendMessageStream(
   request: ChatRequest,
   onChunk: (content: string) => void,
   onComplete?: (usage: any, cost: number) => void
 ): Promise<string> {
-  const response = await fetch('/api/v1/ai/chat/send', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    },
-    body: JSON.stringify({
-      ...request,
-      stream: true
-    })
+  // 修复：路径从 /api/v1/ai/chat/send → /api/ai/chat/send
+  const res: any = await http.post('/ai/chat/send', {
+    session_id: request.session_id,
+    messages: request.messages.map(m => ({ role: m.role, content: m.content })),
+    model_code: request.model_code || 'mock-gpt',
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-  }
+  const sessionId = res.data?.session_id || '';
+  const message = res.data?.message || '';
+  const usage = res.data?.usage;
+  const cost = res.data?.cost || 0;
 
-  const reader = response.body?.getReader();
-  if (!reader) throw new Error('No response body');
-
-  const decoder = new TextDecoder();
-  let fullContent = '';
-  let sessionId = '';
-
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    const chunk = decoder.decode(value);
-    const lines = chunk.split('\n');
-
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          
-          if (data.content !== undefined) {
-            fullContent += data.content;
-            onChunk(data.content);
-          }
-          
-          if (data.done && data.usage) {
-            sessionId = data.session_id || '';
-            onComplete?.(data.usage, data.cost || 0);
-          }
-        } catch (e) {
-          // 忽略解析错误
-        }
-      }
+  // 模拟逐字输出效果（实际后端已返回完整内容）
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i < message.length) {
+      onChunk(message[i]);
+      i++;
+    } else {
+      clearInterval(interval);
+      onComplete?.(usage, cost);
     }
-  }
+  }, 20);
 
   return sessionId;
 }
 
-// 获取会话历史
+// 获取会话消息历史
 export async function getChatHistory(sessionId: string): Promise<AIMessage[]> {
-  const res = await http.get(`/ai/chat/history/${sessionId}`);
-  return res.data?.messages || [];
+  const res: any = await http.get(`/ai/session/${sessionId}/messages`);
+  return (res.data?.list || []).map((m: any) => ({
+    role: m.role,
+    content: m.content,
+    timestamp: m.created_at
+  }));
 }
 
 // 获取会话列表
 export async function listSessions(page = 1, pageSize = 20): Promise<{ items: any[], total: number }> {
-  const res = await http.get('/ai/chat/sessions', { params: { page, page_size: pageSize } });
+  const res: any = await http.get('/ai/session/list', { params: { page, pageSize } });
   return res.data || { items: [], total: 0 };
 }
 
 // 删除会话
 export async function deleteSession(sessionId: string): Promise<void> {
-  await http.delete(`/ai/chat/history/${sessionId}`);
+  await http.delete(`/ai/session/${sessionId}`);
 }
 
-// 获取使用统计
-export async function getUsageStats(month?: string): Promise<any> {
-  const res = await http.get('/ai/model/stats/usage', { params: { month } });
-  return res.data;
+// 获取Token使用统计
+export async function getUsageStats(): Promise<any> {
+  const res: any = await http.get('/ai/session/list', { params: { page: 1, pageSize: 9999 } });
+  const sessions = res.data?.list || [];
+  return {
+    totalTokens: sessions.reduce((s: number, x: any) => s + (x.total_tokens || 0), 0),
+    totalCost: sessions.reduce((s: number, x: any) => s + (x.total_cost || 0), 0),
+    totalSessions: sessions.length
+  };
 }

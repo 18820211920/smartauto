@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAuto 项目看板</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;padding:20px;color:#333}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;background:#fff;padding:16px 24px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.header h1{font-size:20px}
+.stats{display:flex;gap:16px;margin-top:8px}
+.stat{background:#f8f9fa;padding:4px 12px;border-radius:20px;font-size:12px;color:#495057}
+.stat.done{background:#d4edda;color:#155724}
+.stat.backlog{background:#fff3cd;color:#856404}
+.board{display:flex;gap:16px;align-items:flex-start;overflow-x:auto;padding-bottom:20px}
+.column{flex:0 0 240px;background:#f5f6f8;border-radius:12px;display:flex;flex-direction:column;max-height:calc(100vh - 120px);overflow:hidden}
+.col-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;background:#fff;border-radius:12px 12px 0 0}
+.col-name{font-size:13px;font-weight:600}
+.col-count{background:#e9ecef;color:#495057;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px}
+.col-cards{padding:8px 12px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px}
+.card{background:#fff;border-radius:10px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,.06);cursor:grab;transition:all .2s}
+.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.12);transform:translateY(-1px)}
+.card-header{display:flex;justify-content:space-between;margin-bottom:6px}
+.card-id{font-size:11px;color:#adb5bd;font-weight:600}
+.card-title{font-size:13px;font-weight:500;line-height:1.4;margin-bottom:8px;color:#212529}
+.card-meta{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.tag{font-size:10px;padding:2px 7px;border-radius:8px;background:#e9ecef;color:#495057}
+.module-tag{background:#d0d7e0}
+.card-footer{display:flex;justify-content:space-between;font-size:10px;color:#868e96}
+.empty-col{text-align:center;color:#adb5bd;font-size:12px;padding:30px 0}
+.footer{text-align:center;font-size:12px;color:#adb5bd;margin-top:16px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <h1>SmartAuto 项目看板</h1>
+    <div class="stats">
+      <span class="stat">总计 28 张</span>
+      <span class="stat done">已完成 7 张</span>
+      <span class="stat backlog">待办 21 张</span>
+      <span class="stat">更新: 2026-05-15 21:10</span>
+    </div>
+  </div>
+</div>
+<div class="board">
+    <div class="column" id="col-backlog">
+      <div class="col-header" style="border-top:4px solid #909399">
+        <span class="col-name">待办 Backlog</span>
+        <span class="col-count">21</span>
+      </div>
+      <div class="col-cards">
+        <div class="card" draggable="true" data-id="B01">
+          <div class="card-header">
+            <span class="card-id">B01</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【系统】JWT刷新/过期机制</div>
+          <div class="card-meta">
+            <span class="tag module-tag">系统</span>
+            <span class="tag">auth</span> <span class="tag">后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">1d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B02">
+          <div class="card-header">
+            <span class="card-id">B02</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【系统】套餐配额超限拦截逻辑</div>
+          <div class="card-meta">
+            <span class="tag module-tag">系统</span>
+            <span class="tag">套餐</span> <span class="tag">配额</span> <span class="tag">后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B03">
+          <div class="card-header">
+            <span class="card-id">B03</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【系统】到期自动冻结租户机制</div>
+          <div class="card-meta">
+            <span class="tag module-tag">系统</span>
+            <span class="tag">租户</span> <span class="tag">定时</span> <span class="tag">后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">1d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B04">
+          <div class="card-header">
+            <span class="card-id">B04</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【系统】操作审计日志</div>
+          <div class="card-meta">
+            <span class="tag module-tag">系统</span>
+            <span class="tag">审计</span> <span class="tag">后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B05">
+          <div class="card-header">
+            <span class="card-id">B05</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【CRM】客户管理</div>
+          <div class="card-meta">
+            <span class="tag module-tag">销售</span>
+            <span class="tag">CRM</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">3d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B06">
+          <div class="card-header">
+            <span class="card-id">B06</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【CRM】商机管理</div>
+          <div class="card-meta">
+            <span class="tag module-tag">销售</span>
+            <span class="tag">CRM</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B07">
+          <div class="card-header">
+            <span class="card-id">B07</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【CRM】报价管理</div>
+          <div class="card-meta">
+            <span class="tag module-tag">销售</span>
+            <span class="tag">CRM</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B08">
+          <div class="card-header">
+            <span class="card-id">B08</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【CRM】合同管理</div>
+          <div class="card-meta">
+            <span class="tag module-tag">销售</span>
+            <span class="tag">CRM</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">3d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B09">
+          <div class="card-header">
+            <span class="card-id">B09</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【PM】项目列表</div>
+          <div class="card-meta">
+            <span class="tag module-tag">项目</span>
+            <span class="tag">PM</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B10">
+          <div class="card-header">
+            <span class="card-id">B10</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【PM】任务管理</div>
+          <div class="card-meta">
+            <span class="tag module-tag">项目</span>
+            <span class="tag">PM</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B11">
+          <div class="card-header">
+            <span class="card-id">B11</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【RND】产品管理</div>
+          <div class="card-meta">
+            <span class="tag module-tag">研发</span>
+            <span class="tag">研发</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B12">
+          <div class="card-header">
+            <span class="card-id">B12</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【RND】BOM管理</div>
+          <div class="card-meta">
+            <span class="tag module-tag">研发</span>
+            <span class="tag">研发</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">2d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B13">
+          <div class="card-header">
+            <span class="card-id">B13</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【PUR】采购申请/订单/入库</div>
+          <div class="card-meta">
+            <span class="tag module-tag">采购</span>
+            <span class="tag">采购</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">4d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B14">
+          <div class="card-header">
+            <span class="card-id">B14</span>
+            <span>🟠</span>
+          </div>
+          <div class="card-title">【WH】仓库/物料/库位/库存</div>
+          <div class="card-meta">
+            <span class="tag module-tag">仓库</span>
+            <span class="tag">仓库</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">3d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B15">
+          <div class="card-header">
+            <span class="card-id">B15</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【QC】品检模块（IQC/PQC/FQC/OQC）</div>
+          <div class="card-meta">
+            <span class="tag module-tag">品检</span>
+            <span class="tag">品检</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">4d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B16">
+          <div class="card-header">
+            <span class="card-id">B16</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【MFG】生产工单/报工/工序</div>
+          <div class="card-meta">
+            <span class="tag module-tag">生产</span>
+            <span class="tag">生产</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">4d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B17">
+          <div class="card-header">
+            <span class="card-id">B17</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【LOGIS】发货/物流/安装</div>
+          <div class="card-meta">
+            <span class="tag module-tag">发货</span>
+            <span class="tag">发货</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">3d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B18">
+          <div class="card-header">
+            <span class="card-id">B18</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【SVC】售后工单/维保</div>
+          <div class="card-meta">
+            <span class="tag module-tag">售后</span>
+            <span class="tag">售后</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">3d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B19">
+          <div class="card-header">
+            <span class="card-id">B19</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【FIN】财务（收入/支出/发票/付款）</div>
+          <div class="card-meta">
+            <span class="tag module-tag">财务</span>
+            <span class="tag">财务</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">4d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B20">
+          <div class="card-header">
+            <span class="card-id">B20</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【HR】人事（员工/部门/考勤/工资）</div>
+          <div class="card-meta">
+            <span class="tag module-tag">人事</span>
+            <span class="tag">人事</span> <span class="tag">前后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">4d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="B21">
+          <div class="card-header">
+            <span class="card-id">B21</span>
+            <span>🟡</span>
+          </div>
+          <div class="card-title">【部署】Gitee + GitHub代码同步</div>
+          <div class="card-meta">
+            <span class="tag module-tag">部署</span>
+            <span class="tag">Git</span> <span class="tag">部署</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">1d</span>
+            <span class="card-steps"><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span><span style="color:#ccc">░</span></span>
+          </div>
+        </div></div>
+    </div>
+    <div class="column" id="col-spec">
+      <div class="col-header" style="border-top:4px solid #E6A23C">
+        <span class="col-name">需求校验中</span>
+        <span class="col-count">0</span>
+      </div>
+      <div class="col-cards"><div class="empty-col">空</div></div>
+    </div>
+    <div class="column" id="col-planning">
+      <div class="col-header" style="border-top:4px solid #9B59B6">
+        <span class="col-name">规划文档中</span>
+        <span class="col-count">0</span>
+      </div>
+      <div class="col-cards"><div class="empty-col">空</div></div>
+    </div>
+    <div class="column" id="col-skeleton">
+      <div class="col-header" style="border-top:4px solid #3498DB">
+        <span class="col-name">骨架搭建中</span>
+        <span class="col-count">0</span>
+      </div>
+      <div class="col-cards"><div class="empty-col">空</div></div>
+    </div>
+    <div class="column" id="col-sandbox">
+      <div class="col-header" style="border-top:4px solid #1ABC9C">
+        <span class="col-name">沙箱验证中</span>
+        <span class="col-count">0</span>
+      </div>
+      <div class="col-cards"><div class="empty-col">空</div></div>
+    </div>
+    <div class="column" id="col-compliance">
+      <div class="col-header" style="border-top:4px solid #F39C12">
+        <span class="col-name">合规测试中</span>
+        <span class="col-count">0</span>
+      </div>
+      <div class="col-cards"><div class="empty-col">空</div></div>
+    </div>
+    <div class="column" id="col-develop">
+      <div class="col-header" style="border-top:4px solid #E74C3C">
+        <span class="col-name">开发中</span>
+        <span class="col-count">0</span>
+      </div>
+      <div class="col-cards"><div class="empty-col">空</div></div>
+    </div>
+    <div class="column" id="col-done">
+      <div class="col-header" style="border-top:4px solid #27AE60">
+        <span class="col-name">DONE 已完成</span>
+        <span class="col-count">7</span>
+      </div>
+      <div class="col-cards">
+        <div class="card" draggable="true" data-id="D01">
+          <div class="card-header">
+            <span class="card-id">D01</span>
+            <span>🔴</span>
+          </div>
+          <div class="card-title">数据库建表（5个SQL文件，90+张表）</div>
+          <div class="card-meta">
+            <span class="tag module-tag">数据库</span>
+            <span class="tag">SQL</span> <span class="tag">数据库</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">已完成</span>
+            <span class="card-steps"><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="D02">
+          <div class="card-header">
+            <span class="card-id">D02</span>
+            <span>🔴</span>
+          </div>
+          <div class="card-title">后端三层架构骨架（Controller/Service/Dao）</div>
+          <div class="card-meta">
+            <span class="tag module-tag">后端</span>
+            <span class="tag">框架</span> <span class="tag">后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">已完成</span>
+            <span class="card-steps"><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="D03">
+          <div class="card-header">
+            <span class="card-id">D03</span>
+            <span>🔴</span>
+          </div>
+          <div class="card-title">JWT鉴权 + 租户隔离中间件</div>
+          <div class="card-meta">
+            <span class="tag module-tag">系统</span>
+            <span class="tag">auth</span> <span class="tag">中间件</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">已完成</span>
+            <span class="card-steps"><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="D04">
+          <div class="card-header">
+            <span class="card-id">D04</span>
+            <span>🔴</span>
+          </div>
+          <div class="card-title">前端构建 + 部署</div>
+          <div class="card-meta">
+            <span class="tag module-tag">前端</span>
+            <span class="tag">前端</span> <span class="tag">构建</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">已完成</span>
+            <span class="card-steps"><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="D05">
+          <div class="card-header">
+            <span class="card-id">D05</span>
+            <span>🔴</span>
+          </div>
+          <div class="card-title">Nginx反向代理配置</div>
+          <div class="card-meta">
+            <span class="tag module-tag">部署</span>
+            <span class="tag">Nginx</span> <span class="tag">部署</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">已完成</span>
+            <span class="card-steps"><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="D06">
+          <div class="card-header">
+            <span class="card-id">D06</span>
+            <span>🔴</span>
+          </div>
+          <div class="card-title">种子数据（租户/套餐/角色/菜单/用户）</div>
+          <div class="card-meta">
+            <span class="tag module-tag">数据</span>
+            <span class="tag">数据</span> <span class="tag">种子</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">已完成</span>
+            <span class="card-steps"><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span></span>
+          </div>
+        </div>
+        <div class="card" draggable="true" data-id="D07">
+          <div class="card-header">
+            <span class="card-id">D07</span>
+            <span>🔴</span>
+          </div>
+          <div class="card-title">登录接口 POST /smartauto-api/auth/login</div>
+          <div class="card-meta">
+            <span class="tag module-tag">系统</span>
+            <span class="tag">auth</span> <span class="tag">后端</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-est">已完成</span>
+            <span class="card-steps"><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span><span style="color:#27AE60">█</span></span>
+          </div>
+        </div></div>
+    </div></div>
+<div class="footer">拖拽卡片即可移动到不同列 | 数据源: /var/www/smartauto/docs/board/board.json</div>
+<script>
+document.querySelectorAll('.card').forEach(c => {
+  c.addEventListener('dragstart', e => e.dataTransfer.setData('id', c.dataset.id));
+});
+document.querySelectorAll('.col-cards').forEach(col => {
+  col.addEventListener('dragover', e => e.preventDefault());
+  col.addEventListener('drop', e => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('id');
+    const el = document.querySelector('[data-id="'+id+'"]');
+    if (el) col.appendChild(el);
+  });
+});
+</script>
+</body>
+</html>

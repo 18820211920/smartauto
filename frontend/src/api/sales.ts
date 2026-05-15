@@ -37,3 +37,11 @@ export const contractApi = {
   update: (id: number, data: any) => api.put(`/api/sales/contract/${id}`, data),
 }
 
+// 项目管理API
+export const projectApi = {
+  list: (params?: { page?: number; pageSize?: number; status?: string; name?: string }) =>
+    api.get('/api/sales/project/list', { params }),
+  create: (data: any) => api.post('/api/sales/project', data),
+  update: (id: number, data: any) => api.put(`/api/sales/project/${id}`, data),
+  delete: (id: number) => api.delete(`/api/sales/project/${id}`),
+};

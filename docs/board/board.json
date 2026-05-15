@@ -1,0 +1,647 @@
+{
+  "project": "SmartAuto",
+  "version": "1.0.0",
+  "updated": "2026-05-15 21:10",
+  "columns": [
+    {
+      "id": "backlog",
+      "name": "待办 Backlog",
+      "wip": 99,
+      "color": "#909399"
+    },
+    {
+      "id": "spec",
+      "name": "需求校验中",
+      "wip": 3,
+      "color": "#E6A23C"
+    },
+    {
+      "id": "planning",
+      "name": "规划文档中",
+      "wip": 3,
+      "color": "#9B59B6"
+    },
+    {
+      "id": "skeleton",
+      "name": "骨架搭建中",
+      "wip": 3,
+      "color": "#3498DB"
+    },
+    {
+      "id": "sandbox",
+      "name": "沙箱验证中",
+      "wip": 3,
+      "color": "#1ABC9C"
+    },
+    {
+      "id": "compliance",
+      "name": "合规测试中",
+      "wip": 3,
+      "color": "#F39C12"
+    },
+    {
+      "id": "develop",
+      "name": "开发中",
+      "wip": 5,
+      "color": "#E74C3C"
+    },
+    {
+      "id": "done",
+      "name": "DONE 已完成",
+      "wip": 99,
+      "color": "#27AE60"
+    }
+  ],
+  "cards": [
+    {
+      "id": "B01",
+      "col": "backlog",
+      "title": "【系统】JWT刷新/过期机制",
+      "priority": "P1",
+      "module": "系统",
+      "labels": [
+        "auth",
+        "后端"
+      ],
+      "assign": "MAX",
+      "estimate": "1d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B02",
+      "col": "backlog",
+      "title": "【系统】套餐配额超限拦截逻辑",
+      "priority": "P1",
+      "module": "系统",
+      "labels": [
+        "套餐",
+        "配额",
+        "后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B03",
+      "col": "backlog",
+      "title": "【系统】到期自动冻结租户机制",
+      "priority": "P1",
+      "module": "系统",
+      "labels": [
+        "租户",
+        "定时",
+        "后端"
+      ],
+      "assign": "MAX",
+      "estimate": "1d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B04",
+      "col": "backlog",
+      "title": "【系统】操作审计日志",
+      "priority": "P2",
+      "module": "系统",
+      "labels": [
+        "审计",
+        "后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B05",
+      "col": "backlog",
+      "title": "【CRM】客户管理",
+      "priority": "P1",
+      "module": "销售",
+      "labels": [
+        "CRM",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "3d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B06",
+      "col": "backlog",
+      "title": "【CRM】商机管理",
+      "priority": "P1",
+      "module": "销售",
+      "labels": [
+        "CRM",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B07",
+      "col": "backlog",
+      "title": "【CRM】报价管理",
+      "priority": "P1",
+      "module": "销售",
+      "labels": [
+        "CRM",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B08",
+      "col": "backlog",
+      "title": "【CRM】合同管理",
+      "priority": "P1",
+      "module": "销售",
+      "labels": [
+        "CRM",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "3d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B09",
+      "col": "backlog",
+      "title": "【PM】项目列表",
+      "priority": "P1",
+      "module": "项目",
+      "labels": [
+        "PM",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B10",
+      "col": "backlog",
+      "title": "【PM】任务管理",
+      "priority": "P1",
+      "module": "项目",
+      "labels": [
+        "PM",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B11",
+      "col": "backlog",
+      "title": "【RND】产品管理",
+      "priority": "P1",
+      "module": "研发",
+      "labels": [
+        "研发",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B12",
+      "col": "backlog",
+      "title": "【RND】BOM管理",
+      "priority": "P1",
+      "module": "研发",
+      "labels": [
+        "研发",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "2d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B13",
+      "col": "backlog",
+      "title": "【PUR】采购申请/订单/入库",
+      "priority": "P1",
+      "module": "采购",
+      "labels": [
+        "采购",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "4d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B14",
+      "col": "backlog",
+      "title": "【WH】仓库/物料/库位/库存",
+      "priority": "P1",
+      "module": "仓库",
+      "labels": [
+        "仓库",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "3d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B15",
+      "col": "backlog",
+      "title": "【QC】品检模块（IQC/PQC/FQC/OQC）",
+      "priority": "P2",
+      "module": "品检",
+      "labels": [
+        "品检",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "4d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B16",
+      "col": "backlog",
+      "title": "【MFG】生产工单/报工/工序",
+      "priority": "P2",
+      "module": "生产",
+      "labels": [
+        "生产",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "4d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B17",
+      "col": "backlog",
+      "title": "【LOGIS】发货/物流/安装",
+      "priority": "P2",
+      "module": "发货",
+      "labels": [
+        "发货",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "3d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B18",
+      "col": "backlog",
+      "title": "【SVC】售后工单/维保",
+      "priority": "P2",
+      "module": "售后",
+      "labels": [
+        "售后",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "3d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B19",
+      "col": "backlog",
+      "title": "【FIN】财务（收入/支出/发票/付款）",
+      "priority": "P2",
+      "module": "财务",
+      "labels": [
+        "财务",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "4d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B20",
+      "col": "backlog",
+      "title": "【HR】人事（员工/部门/考勤/工资）",
+      "priority": "P2",
+      "module": "人事",
+      "labels": [
+        "人事",
+        "前后端"
+      ],
+      "assign": "MAX",
+      "estimate": "4d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "B21",
+      "col": "backlog",
+      "title": "【部署】Gitee + GitHub代码同步",
+      "priority": "P2",
+      "module": "部署",
+      "labels": [
+        "Git",
+        "部署"
+      ],
+      "assign": "MAX",
+      "estimate": "1d",
+      "steps": {
+        "一": 0,
+        "二": 0,
+        "三": 0,
+        "四": 0,
+        "五": 0,
+        "六": 0
+      }
+    },
+    {
+      "id": "D01",
+      "col": "done",
+      "title": "数据库建表（5个SQL文件，90+张表）",
+      "priority": "P0",
+      "module": "数据库",
+      "labels": [
+        "SQL",
+        "数据库"
+      ],
+      "assign": "MAX",
+      "estimate": "已完成",
+      "steps": {
+        "一": 1,
+        "二": 1,
+        "三": 1,
+        "四": 1,
+        "五": 1,
+        "六": 1
+      }
+    },
+    {
+      "id": "D02",
+      "col": "done",
+      "title": "后端三层架构骨架（Controller/Service/Dao）",
+      "priority": "P0",
+      "module": "后端",
+      "labels": [
+        "框架",
+        "后端"
+      ],
+      "assign": "MAX",
+      "estimate": "已完成",
+      "steps": {
+        "一": 1,
+        "二": 1,
+        "三": 1,
+        "四": 1,
+        "五": 1,
+        "六": 1
+      }
+    },
+    {
+      "id": "D03",
+      "col": "done",
+      "title": "JWT鉴权 + 租户隔离中间件",
+      "priority": "P0",
+      "module": "系统",
+      "labels": [
+        "auth",
+        "中间件"
+      ],
+      "assign": "MAX",
+      "estimate": "已完成",
+      "steps": {
+        "一": 1,
+        "二": 1,
+        "三": 1,
+        "四": 1,
+        "五": 1,
+        "六": 1
+      }
+    },
+    {
+      "id": "D04",
+      "col": "done",
+      "title": "前端构建 + 部署",
+      "priority": "P0",
+      "module": "前端",
+      "labels": [
+        "前端",
+        "构建"
+      ],
+      "assign": "MAX",
+      "estimate": "已完成",
+      "steps": {
+        "一": 1,
+        "二": 1,
+        "三": 1,
+        "四": 1,
+        "五": 1,
+        "六": 1
+      }
+    },
+    {
+      "id": "D05",
+      "col": "done",
+      "title": "Nginx反向代理配置",
+      "priority": "P0",
+      "module": "部署",
+      "labels": [
+        "Nginx",
+        "部署"
+      ],
+      "assign": "MAX",
+      "estimate": "已完成",
+      "steps": {
+        "一": 1,
+        "二": 1,
+        "三": 1,
+        "四": 1,
+        "五": 1,
+        "六": 1
+      }
+    },
+    {
+      "id": "D06",
+      "col": "done",
+      "title": "种子数据（租户/套餐/角色/菜单/用户）",
+      "priority": "P0",
+      "module": "数据",
+      "labels": [
+        "数据",
+        "种子"
+      ],
+      "assign": "MAX",
+      "estimate": "已完成",
+      "steps": {
+        "一": 1,
+        "二": 1,
+        "三": 1,
+        "四": 1,
+        "五": 1,
+        "六": 1
+      }
+    },
+    {
+      "id": "D07",
+      "col": "done",
+      "title": "登录接口 POST /smartauto-api/auth/login",
+      "priority": "P0",
+      "module": "系统",
+      "labels": [
+        "auth",
+        "后端"
+      ],
+      "assign": "MAX",
+      "estimate": "已完成",
+      "steps": {
+        "一": 1,
+        "二": 1,
+        "三": 1,
+        "四": 1,
+        "五": 1,
+        "六": 1
+      }
+    }
+  ]
+}

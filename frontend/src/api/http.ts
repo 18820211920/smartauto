@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://123.207.15.108:3847',
+  baseURL: '/smartauto-api',
   timeout: 15000,
   withCredentials: false,
   headers: {
@@ -32,4 +32,3 @@ api.interceptors.response.use(
 
 export const http = api
 export default api
-
