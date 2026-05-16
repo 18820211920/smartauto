@@ -291,19 +291,20 @@ app.post('/api/ai/chat/send', verifyToken, async (req, res) => {
     const cost = (promptTokens * 0.0001 + completionTokens * 0.0002) / 1000;
     
     const p = getPool();
-    
+    const roleMap = { user: 1, assistant: 2, system: 0 };
     for (const msg of messages) {
       if (msg.role === 'user') {
+        const roleNum = roleMap[msg.role] || 0;
         await p.query(
-          'INSERT INTO ai_message (tenant_id, session_id, role, content, model_code) VALUES (?, ?, ?, ?, ?)',
-          [tenantId, sid, msg.role, msg.content, model_code || 'mock-gpt']
+          'INSERT INTO ai_message (tenant_id, session_id, conversation_id, role, content, model_id) VALUES (?, ?, 1, ?, ?, 1)',
+          [tenantId, sid, roleNum, msg.content]
         );
       }
     }
     
     await p.query(
-      'INSERT INTO ai_message (tenant_id, session_id, role, content, model_code, prompt_tokens, completion_tokens, latency_ms, cost) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [tenantId, sid, 'assistant', responseText, model_code || 'mock-gpt', promptTokens, completionTokens, latencyMs, cost]
+      'INSERT INTO ai_message (tenant_id, session_id, conversation_id, role, content, model_id, input_tokens, output_tokens, latency_ms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [tenantId, sid, 1, 2, responseText, 1, promptTokens, completionTokens, latencyMs]
     );
     
     await p.query(
@@ -363,7 +364,7 @@ app.get('/api/ai/session/:sessionId/messages', verifyToken, async (req, res) => 
     
     const p = getPool();
     const [rows] = await p.query(
-      'SELECT id, role, content, model_code, prompt_tokens, completion_tokens, latency_ms, cost, created_at FROM ai_message WHERE tenant_id = ? AND session_id = ? ORDER BY id',
+      'SELECT id, role, content, input_tokens, output_tokens, latency_ms, created_at FROM ai_message WHERE tenant_id = ? AND session_id = ? ORDER BY id',
       [tenantId, sessionId]
     );
     
