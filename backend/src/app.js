@@ -521,13 +521,13 @@ app.get('/api/sales/business/list', verifyToken, async (req, res) => {
     const tenantId = req.user.tenant_id;
     const p = getPool();
     
-    let sql = 'SELECT b.*, c.name as customer_name FROM crm_business b LEFT JOIN crm_customer c ON b.customer_id=c.id WHERE b.tenant_id=? AND b.is_deleted=0';
+    let sql = 'SELECT b.*, c.customer_name as customer_name FROM crm_business b LEFT JOIN crm_customer c ON b.customer_id=c.id WHERE b.tenant_id=? AND b.is_deleted=0';
     const params = [tenantId];
     if (name) { sql += ' AND b.name LIKE ?'; params.push('%' + name + '%'); }
     if (status) { sql += ' AND b.status = ?'; params.push(status); }
     if (priority) { sql += ' AND b.priority = ?'; params.push(priority); }
     
-    const [countRows] = await p.query(sql.replace('SELECT b.*, c.name as customer_name', 'SELECT COUNT(*) as total'), params);
+    const [countRows] = await p.query(sql.replace('SELECT b.*, c.customer_name as customer_name', 'SELECT COUNT(*) as total'), params);
     const total = countRows[0]?.total || 0;
     
     sql += ' ORDER BY b.id DESC LIMIT ? OFFSET ?';
@@ -618,12 +618,12 @@ app.get('/api/sales/quote/list', verifyToken, async (req, res) => {
     const tenantId = req.user.tenant_id;
     const p = getPool();
     
-    let sql = 'SELECT q.*, c.name as customer_name FROM crm_quote q LEFT JOIN crm_customer c ON q.customer_id=c.id WHERE q.tenant_id=? AND q.is_deleted=0';
+    let sql = 'SELECT q.*, c.customer_name as customer_name FROM crm_quote q LEFT JOIN crm_customer c ON q.customer_id=c.id WHERE q.tenant_id=? AND q.is_deleted=0';
     const params = [tenantId];
     if (customer_id) { sql += ' AND q.customer_id = ?'; params.push(customer_id); }
     if (status) { sql += ' AND q.status = ?'; params.push(status); }
     
-    const [countRows] = await p.query(sql.replace('SELECT q.*, c.name as customer_name', 'SELECT COUNT(*) as total'), params);
+    const [countRows] = await p.query(sql.replace('SELECT q.*, c.customer_name as customer_name', 'SELECT COUNT(*) as total'), params);
     const total = countRows[0]?.total || 0;
     
     sql += ' ORDER BY q.id DESC LIMIT ? OFFSET ?';
@@ -696,12 +696,12 @@ app.get('/api/sales/contract/list', verifyToken, async (req, res) => {
     const tenantId = req.user.tenant_id;
     const p = getPool();
     
-    let sql = 'SELECT c.*, cu.name as customer_name FROM crm_contract c LEFT JOIN crm_customer cu ON c.customer_id=cu.id WHERE c.tenant_id=? AND c.is_deleted=0';
+    let sql = 'SELECT c.*, cu.customer_name as customer_name FROM crm_contract c LEFT JOIN crm_customer cu ON c.customer_id=cu.id WHERE c.tenant_id=? AND c.is_deleted=0';
     const params = [tenantId];
     if (customer_id) { sql += ' AND c.customer_id = ?'; params.push(customer_id); }
     if (status) { sql += ' AND c.status = ?'; params.push(status); }
     
-    const [countRows] = await p.query(sql.replace('SELECT c.*, cu.name as customer_name', 'SELECT COUNT(*) as total'), params);
+    const [countRows] = await p.query(sql.replace('SELECT c.*, cu.customer_name as customer_name', 'SELECT COUNT(*) as total'), params);
     const total = countRows[0]?.total || 0;
     
     sql += ' ORDER BY c.id DESC LIMIT ? OFFSET ?';
@@ -905,7 +905,7 @@ app.get('/api/sales/overview/business/list', verifyToken, async (req, res) => {
     const tenantId = req.user.tenant_id;
     const p = getPool();
     const [rows] = await p.query(
-      `SELECT b.id, b.code, b.name, b.amount, b.stage, b.priority, b.close_date, b.status, c.name as customer_name
+      `SELECT b.id, b.code, b.name, b.amount, b.stage, b.priority, b.close_date, b.status, c.customer_name as customer_name
        FROM crm_business b LEFT JOIN crm_customer c ON b.customer_id=c.id
        WHERE b.tenant_id = ? AND b.is_deleted = 0 ORDER BY b.id DESC LIMIT 100`,
       [tenantId]
@@ -922,7 +922,7 @@ app.get('/api/sales/overview/contract/list', verifyToken, async (req, res) => {
     const tenantId = req.user.tenant_id;
     const p = getPool();
     const [rows] = await p.query(
-      `SELECT c.id, c.code, c.subject, c.amount, c.sign_date, c.start_date, c.end_date, c.status, cu.name as customer_name
+      `SELECT c.id, c.code, c.subject, c.amount, c.sign_date, c.start_date, c.end_date, c.status, cu.customer_name as customer_name
        FROM crm_contract c LEFT JOIN crm_customer cu ON c.customer_id=cu.id
        WHERE c.tenant_id = ? AND c.is_deleted = 0 ORDER BY c.id DESC LIMIT 50`,
       [tenantId]
