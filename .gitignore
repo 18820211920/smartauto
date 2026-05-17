@@ -1,40 +1,18 @@
-# dependencies
-/node_modules
-
-# build output
-/docs/system-dev/dist
-frontend/dist/assets/
-*.local
-build/
-dist-ssr/
-.vite/
-.turbo/
-
-# local env files
-/docs/system-dev/.env
-/docs/system-dev/.env.local
-/docs/system-dev/.env.*.local
-
-# editor directories and files
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# logs
+node_modules/
+dist/
+dist_new/
+.vscode/
+.idea/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-
-# coverage
-coverage/
-.cache/
-
-# misc backup files
-*.bak
-*.bak1
-*.bak2
+.DS_Store
+.env.local
+.env.production
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
