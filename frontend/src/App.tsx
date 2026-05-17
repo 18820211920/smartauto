@@ -1,6 +1,7 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { ConfigProvider, message } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
+import { useEffect } from 'react';
 import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
@@ -8,6 +9,8 @@ import AIChatPage from './pages/AIChatPage';
 import SalesCustomer from './pages/sales/Customer';
 import SalesQuote from './pages/sales/Quote';
 import SalesContract from './pages/sales/Contract';
+import SalesContact from './pages/sales/Contact';
+import { useAuthStore } from './store/auth';
 
 // 销售子页面
 import SalesOverview from './pages/sales/Overview';
@@ -81,6 +84,44 @@ const theme = {
   algorithm: undefined, // 禁用暗色算法，保持浅色
 };
 
+// 路由守卫组件
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const token = useAuthStore(state => state.token);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!token) {
+      message.warning('请先登录');
+      navigate('/login', { replace: true });
+    }
+  }, [token, navigate]);
+  
+  if (!token) {
+    return null;
+  }
+  
+  return <>{children}</>;
+}
+
+// AI聊天页面也需登录
+function AIProtectedRoute({ children }: { children: React.ReactNode }) {
+  const token = useAuthStore(state => state.token);
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (!token) {
+      message.warning('请先登录');
+      navigate('/login', { replace: true });
+    }
+  }, [token, navigate]);
+  
+  if (!token) {
+    return null;
+  }
+  
+  return <>{children}</>;
+}
+
 function App() {
   return (
     <ConfigProvider theme={theme} locale={zhCN}>
@@ -89,17 +130,18 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<Navigate to="/sales" replace />} />
           
-          {/* 主布局路由 */}
-          <Route path="/sales" element={<MainLayout />}>
+          {/* 主布局路由 - 需登录 */}
+          <Route path="/sales" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<SalesOverview />} />
             <Route path="customer" element={<SalesCustomer />} />
             <Route path="opportunity" element={<SalesOpportunity />} />
             <Route path="quote" element={<SalesQuote />} />
             <Route path="contract" element={<SalesContract />} />
+            <Route path="contact" element={<SalesContact />} />
             <Route path="project" element={<SalesProject />} />
           </Route>
           
-          <Route path="/rnd" element={<MainLayout />}>
+          <Route path="/rnd" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="product" element={<ProductPage />} />
             <Route path="bom" element={<BomPage />} />
             <Route path="task" element={<TaskPage />} />
@@ -107,41 +149,43 @@ function App() {
             <Route index element={<RndPage />} />
           </Route>
           
-          <Route path="/purchase" element={<MainLayout />}>
+          <Route path="/purchase" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<PurchasePage />} />
           </Route>
           
-          <Route path="/warehouse" element={<MainLayout />}>
+          <Route path="/warehouse" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<WarehousePage />} />
           </Route>
           
-          <Route path="/production" element={<MainLayout />}>
+          <Route path="/production" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<ProductionPage />} />
           </Route>
           
-          <Route path="/logistics" element={<MainLayout />}>
+          <Route path="/logistics" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<LogisticsPage />} />
           </Route>
           
-          <Route path="/acceptance" element={<MainLayout />}>
+          <Route path="/acceptance" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<AcceptancePage />} />
           </Route>
           
-          <Route path="/aftersale" element={<MainLayout />}>
+          <Route path="/aftersale" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<AftersalePage />} />
           </Route>
           
-          <Route path="/finance" element={<MainLayout />}>
+          <Route path="/finance" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<FinancePage />} />
           </Route>
           
-          <Route path="/hr" element={<MainLayout />}>
+          <Route path="/hr" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route index element={<HrPage />} />
           </Route>
           
-          {/* 其他路由 */}
-          <Route path="/ai" element={<AIChatPage />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* AI聊天页面 */}
+          <Route path="/ai" element={<AIProtectedRoute><AIChatPage /></AIProtectedRoute>} />
+          
+          {/* 仪表盘 */}
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           
           {/* 默认重定向 */}
           <Route path="*" element={<Navigate to="/sales" replace />} />

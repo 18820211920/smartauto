@@ -44,6 +44,8 @@ export const useAuthStore = create<AuthState>()(
       },
       logout: () => {
         set({ token: null, user: null, tenant: null })
+        // 清除localStorage中的token
+        localStorage.removeItem('smartauto-auth')
       },
       fetchTenant: async () => {
         // 可扩展

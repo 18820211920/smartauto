@@ -2136,3 +2136,97 @@ app.listen(config.port, () => {
 });
 
 module.exports = app;
+
+// ============ AI流式对话接口 (SSE) ============
+app.post('/api/ai/chat/stream', verifyToken, async (req, res) => {
+  try {
+    const tenantId = req.user.tenant_id;
+    const userId = req.user.id;
+    const { session_id, messages, model_code } = req.body;
+    
+    const sid = session_id || 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const userMessages = messages.filter(m => m.role === 'user');
+    const lastUserMessage = userMessages[userMessages.length - 1]?.content || '';
+    
+    const startTime = Date.now();
+    let responseText = '';
+    
+    // Mock响应逻辑
+    if (lastUserMessage.includes('客户') || lastUserMessage.includes('商机')) {
+      responseText = '根据您的需求，我为您找到了以下信息：\n\n1. 当前共有4个客户，其中A级客户3个\n2. 活跃商机1个，金额80万元\n3. 建议关注比亚迪公司的Pack生产线项目\n\n需要我帮您做更详细的分析吗？';
+    } else if (lastUserMessage.includes('合同') || lastUserMessage.includes('报价')) {
+      responseText = '关于合同和报价：\n\n1. 当前有1份合同，金额70万元\n2. 报价单1份，金额75万元\n3. 商机跟进中，阶段为合同谈判\n\n还有其他问题吗？';
+    } else if (lastUserMessage.includes('帮助') || lastUserMessage.includes('怎么')) {
+      responseText = '我是SmartAuto AI助手，可以帮您：\n\n1. 查询客户信息和商机状态\n2. 查看报价单和合同进度\n3. 分析销售数据和业绩\n4. 回答系统使用相关问题\n\n请告诉我您的需求！';
+    } else {
+      responseText = '收到您的消息：「' + lastUserMessage.substring(0, 50) + (lastUserMessage.length > 50 ? '...' : '') + '」\n\n我将为您处理这个请求。如需更多帮助，请详细描述您的问题。';
+    }
+    
+    // 保存用户消息
+    const p = getPool();
+    for (const msg of messages) {
+      if (msg.role === 'user') {
+        await p.query(
+          'INSERT INTO ai_message (tenant_id, session_id, conversation_id, role, content, model_id) VALUES (?, ?, 1, 1, ?, 1)',
+          [tenantId, sid, msg.content]
+        );
+      }
+    }
+    
+    // 设置SSE响应头
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    
+    // 流式输出
+    const chunks = responseText.split('');
+    let fullResponse = '';
+    
+    for (const char of chunks) {
+      fullResponse += char;
+      res.write('data: ' + JSON.stringify({ 
+        type: 'chunk', 
+        content: char,
+        full: fullResponse
+      }) + '\n\n');
+      await new Promise(r => setTimeout(r, 20));
+    }
+    
+    // 计算统计
+    const latencyMs = Date.now() - startTime;
+    const promptTokens = Math.ceil(lastUserMessage.length / 4);
+    const completionTokens = Math.ceil(responseText.length / 4);
+    const totalTokens = promptTokens + completionTokens;
+    const cost = (promptTokens * 0.0001 + completionTokens * 0.0002) / 1000;
+    
+    // 保存AI响应
+    await p.query(
+      'INSERT INTO ai_message (tenant_id, session_id, conversation_id, role, content, model_id, input_tokens, output_tokens, latency_ms) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [tenantId, sid, 1, 2, responseText, 1, promptTokens, completionTokens, latencyMs]
+    );
+    
+    // 更新会话
+    await p.query(
+      'INSERT INTO ai_session (tenant_id, user_id, session_id, title, model_code, message_count, total_tokens, total_cost, last_message, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW()) ON DUPLICATE KEY UPDATE message_count = message_count + 2, total_tokens = total_tokens + ?, total_cost = total_cost + ?, last_message = ?, updated_at = NOW()',
+      [tenantId, userId, sid, lastUserMessage.substring(0, 50), model_code || 'mock-gpt', messages.length, totalTokens, cost, lastUserMessage.substring(0, 100), totalTokens, cost, lastUserMessage.substring(0, 100)]
+    );
+    
+    // 发送完成信号
+    res.write('data: ' + JSON.stringify({ 
+      type: 'done',
+      session_id: sid,
+      usage: { prompt_tokens: promptTokens, completion_tokens: completionTokens, total_tokens: totalTokens },
+      cost: cost,
+      latency_ms: latencyMs
+    }) + '\n\n');
+    
+    res.write('data: [DONE]\n\n');
+    res.end();
+    
+  } catch (e) {
+    console.error('AI stream error:', e);
+    res.write('data: ' + JSON.stringify({ type: 'error', message: e.message }) + '\n\n');
+    res.end();
+  }
+});

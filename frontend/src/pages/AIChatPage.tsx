@@ -1,8 +1,11 @@
 /**
- * AI对话页面 - Phase 2
- * 支持流式对话、多模型切换、会话历史
+ * AI对话页面 - Phase 3 Enhanced
+ * 真正的SSE流式输出、Markdown渲染、代码高亮
  */
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { listModels, sendMessageStream, type AIModel, type AIMessage } from '../api/ai';
 
 export default function AIChatPage() {
@@ -40,7 +43,7 @@ export default function AIChatPage() {
     }
   };
 
-  // 发送消息
+  // 发送消息（真正的SSE流式）
   const handleSend = async () => {
     if (!input.trim() || isStreaming) return;
 
@@ -69,23 +72,36 @@ export default function AIChatPage() {
           model_code: selectedModel,
           stream: true
         },
-        (chunk) => {
+        // onChunk: (_content, full) => {}
+        (_content, full) => {
           setMessages(prev => {
             const updated = [...prev];
             const lastMsg = updated[updated.length - 1];
             if (lastMsg && lastMsg.role === 'assistant') {
-              lastMsg.content += chunk;
+              lastMsg.content = full;
             }
             return updated;
           });
         },
-        (usageData, costData) => {
+        // onComplete: (usage, cost, sessionId) => {}
+        (usageData, costData, sid) => {
           setUsage(usageData);
           setCost(costData);
+          if (!sessionId) setSessionId(sid);
+        },
+        // onError: (error) => {}
+        (error) => {
+          console.error('Chat error:', error);
+          setMessages(prev => {
+            const updated = [...prev];
+            const lastMsg = updated[updated.length - 1];
+            if (lastMsg && lastMsg.role === 'assistant') {
+              lastMsg.content = '抱歉，发生了错误: ' + error.message + '\n\n请稍后重试。';
+            }
+            return updated;
+          });
         }
-      ).then(sid => {
-        if (!sessionId) setSessionId(sid);
-      });
+      );
     } catch (error) {
       console.error('Chat error:', error);
       setMessages(prev => {
@@ -121,7 +137,7 @@ export default function AIChatPage() {
     <div className="ai-chat-page" style={styles.container}>
       {/* 模型选择 */}
       <div style={styles.header}>
-        <h2 style={styles.title}>AI 对话</h2>
+        <h2 style={styles.title}>🤖 AI 对话</h2>
         <select
           value={selectedModel}
           onChange={e => setSelectedModel(e.target.value)}
@@ -134,7 +150,7 @@ export default function AIChatPage() {
           ))}
         </select>
         <button onClick={handleClear} style={styles.clearBtn}>
-          新对话
+          🗑️ 新对话
         </button>
       </div>
 
@@ -144,7 +160,7 @@ export default function AIChatPage() {
           <div style={styles.empty}>
             <div style={styles.emptyIcon}>💬</div>
             <p>开始一段新的对话吧</p>
-            <p style={styles.hint}>支持多模型切换，知识库增强回答</p>
+            <p style={styles.hint}>支持Markdown格式、代码高亮、知识库增强</p>
           </div>
         )}
 
@@ -156,12 +172,37 @@ export default function AIChatPage() {
               ...(msg.role === 'user' ? styles.userMessage : styles.assistantMessage)
             }}
           >
-            <div style={styles.avatar}>
+            <div style={{...styles.avatar, background: msg.role === 'user' ? '#6366f1' : '#10b981'}}>
               {msg.role === 'user' ? '👤' : '🤖'}
             </div>
             <div style={styles.messageContent}>
-              <div style={styles.messageText}>
-                {msg.content}
+              <div style={{...styles.messageText, background: msg.role === 'user' ? '#6366f1' : '#f5f5f5', color: msg.role === 'user' ? '#fff' : '#333'}}>
+                {msg.role === 'user' ? (
+                  <span>{msg.content}</span>
+                ) : (
+                  <ReactMarkdown
+                    children={msg.content}
+                    components={{
+                      code({node, inline, className, children, ...props}: any) {
+                        const match = /language-(\\w+)/.exec(className || '');
+                        return !inline && match ? (
+                          <SyntaxHighlighter
+                            style={oneDark}
+                            language={match[1]}
+                            PreTag="div"
+                            {...props}
+                          >
+                            {String(children).replace(/\\n$/, '')}
+                          </SyntaxHighlighter>
+                        ) : (
+                          <code className={className} {...props}>
+                            {children}
+                          </code>
+                        );
+                      }
+                    }}
+                  />
+                )}
                 {msg.role === 'assistant' && isStreaming && idx === messages.length - 1 && (
                   <span style={styles.cursor}>▊</span>
                 )}
@@ -188,7 +229,7 @@ export default function AIChatPage() {
           value={input}
           onChange={e => { setInput(e.target.value); autoResize(); }}
           onKeyDown={handleKeyDown}
-          placeholder="输入消息，Enter发送，Shift+Enter换行..."
+          placeholder="输入消息，支持Markdown格式 Enter发送，Shift+Enter换行..."
           style={styles.textarea}
           disabled={isStreaming}
         />
@@ -200,7 +241,7 @@ export default function AIChatPage() {
             ...(input.trim() && !isStreaming ? {} : styles.sendBtnDisabled)
           }}
         >
-          {isStreaming ? '...' : '发送'}
+          {isStreaming ? '⏳...' : '🚀 发送'}
         </button>
       </div>
     </div>
@@ -275,12 +316,12 @@ const styles: Record<string, React.CSSProperties> = {
     width: '36px',
     height: '36px',
     borderRadius: '50%',
-    background: '#f0f0f0',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '18px',
-    flexShrink: 0
+    flexShrink: 0,
+    color: '#fff'
   },
   messageContent: {
     maxWidth: '70%'

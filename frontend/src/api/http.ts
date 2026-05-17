@@ -1,7 +1,9 @@
 import axios from 'axios'
 
+// API基础配置 - 与后端 /api/v1/* 一致
+// Nginx已配置 /api/ -> localhost:3847/api/
 const api = axios.create({
-  baseURL: '/smartauto-api',
+  baseURL: '/api/v1',
   timeout: 15000,
   withCredentials: false,
   headers: {
